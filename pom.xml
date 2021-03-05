@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.zzf.mallproject</groupId>
+	<artifactId>mallproject</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>mallproject</name>
+	<description>聚合服务</description>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>mallproject-ware</module>
+		<module>mallproject-coupon</module>
+		<module>mallproject-menber</module>
+		<module>mallproject-order</module>
+		<module>mallproject-product</module>
+	</modules>
+</project>
