@@ -8,7 +8,7 @@
 		<version>2.4.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.zzf.mallpreject</groupId>
+	<groupId>com.zzf.mallproject</groupId>
 	<artifactId>mallproject-product</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>mallproject-product</name>
@@ -18,6 +18,11 @@
 		<spring-cloud.version>2020.0.1</spring-cloud.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>com.zzf.mallproject</groupId>
+			<artifactId>mallproject-common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -30,6 +35,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
