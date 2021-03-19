@@ -16,5 +16,6 @@
 		<module>mallproject-menber</module>
 		<module>mallproject-order</module>
 		<module>mallproject-product</module>
+		<module>mallproject-common</module>
 	</modules>
 </project>
