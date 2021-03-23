@@ -6,16 +6,14 @@ spring:
       discovery:
         server-addr: 127.0.0.1:8848
       config:
-        extension-configs[0]:
-          data-id: datasource.yml
+        extension-configs:
+        - data-id: datasource.yml
           group: dev
           refresh: true
-        extension-configs[1]:
-          data-id: mybatis.yml
+        - data-id: mybatis.yml
           group: dev
           refresh: true
-        extension-configs[2]:
-          data-id: others.yml
+        - data-id: others.yml
           group: dev
           refresh: true
         namespace: f1f8fe2c-8bfb-4328-b9b5-59055123895f
