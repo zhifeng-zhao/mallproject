@@ -17,5 +17,6 @@
 		<module>mallproject-order</module>
 		<module>mallproject-product</module>
 		<module>mallproject-common</module>
+		<module>mallproject-gateway</module>
 	</modules>
 </project>
