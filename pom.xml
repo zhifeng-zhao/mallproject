@@ -18,5 +18,6 @@
 		<module>mallproject-product</module>
 		<module>mallproject-common</module>
 		<module>mallproject-gateway</module>
+		<module>renren-fast</module>
 	</modules>
 </project>
