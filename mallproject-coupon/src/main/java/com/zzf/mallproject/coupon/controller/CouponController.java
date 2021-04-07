@@ -4,11 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.zzf.mallproject.coupon.entity.CouponEntity;
 import com.zzf.mallproject.coupon.service.CouponService;
@@ -29,6 +25,13 @@ import com.zzf.mallproject.common.utils.R;
 public class CouponController {
     @Autowired
     private CouponService couponService;
+
+    @RequestMapping("/menberCoupon")
+    public R getMenberCoupons () {
+        CouponEntity coupons = new CouponEntity();
+        coupons.setCouponName("满100减10");
+        return R.ok().put("menberCoupons",Arrays.asList(coupons));
+    }
 
     /**
      * 列表
