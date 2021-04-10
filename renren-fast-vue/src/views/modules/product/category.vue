@@ -33,7 +33,7 @@
         </span>
       </span>
     </el-tree>
-    <el-dialog :title="title" :visible.sync="dialogVisible" width="30%">
+    <el-dialog :title="title" :visible.sync="dialogVisible" width="30%" :close-on-click-modal="false">
       <el-form :model="category">
         <el-form-item label="分类名称">
           <el-input v-model="category.name" autocomplete="off"></el-input>
@@ -69,7 +69,7 @@ export default {
         sort: 0,
         catId: null,
         icon: "",
-        productUnit: ""
+        productUnit: "",
       },
       dialogVisible: false,
       dialogType: "",
@@ -98,14 +98,30 @@ export default {
       this.dialogVisible = true;
       this.category.parentCid = data.catId;
       this.category.catLevel = data.catLevel * 1 + 1;
+      this.category.catId = null;
+      this.category.name = "";
+      this.category.icon = "";
+      this.category.productUnit = "";
+      this.category.sort = 0;
+      this.category.showStatus = 1;
     },
     edit(data) {
       console.log("修改的数据", data);
       this.dialogType = "edit";
       this.title = "修改";
       this.dialogVisible = true;
-      this.category.name = data.name;
-      this.category.catId = data.catId;
+      //发送请求获取当前最新数据、
+      this.http({
+        url: this.$http.adornUrl(`/product/category/info/${data.catId}`),
+        method: "get",
+        params: this.$http.adornParams({}),
+      }).then(({ data }) => {
+        this.category.name = data.data.name;
+        this.category.catId = data.data.catId;
+        this.category.icon = data.data.icon;
+        this.category.productUnit = data.data.productUnit;
+        this.category.parentCid = data.data.parentCid;
+      });
     },
     submit() {
       if (this.dialogType == "add") {
@@ -116,7 +132,22 @@ export default {
       }
     },
     //修改3级分类
-    editCategory() {},
+    editCategory() {
+      var {catId,name,icon,productUnit} = this.category;
+      this.http({
+        url: this.$http.adornUrl("/product/category/update"),
+        method: "post",
+        data: this.$http.adornData({catId,name,icon,productUnit}, false),
+      }).then(({ data }) => {
+        this.$message({
+          message: "菜单修改成功",
+          type: "success",
+        });
+        this.dialogVisible = false;
+        this.getMenus();
+        this.expandedKey = [this.category.parentCid];
+      });
+    },
     //添加3级分类
     addCategory() {
       this.http({
