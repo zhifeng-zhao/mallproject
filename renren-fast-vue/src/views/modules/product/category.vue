@@ -7,6 +7,8 @@
       show-checkbox="true"
       node-key="catId"
       :default-expanded-keys="expandedKey"
+      draggable
+      :allow-drop="allowDrop"
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -33,7 +35,12 @@
         </span>
       </span>
     </el-tree>
-    <el-dialog :title="title" :visible.sync="dialogVisible" width="30%" :close-on-click-modal="false">
+    <el-dialog
+      :title="title"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :close-on-click-modal="false"
+    >
       <el-form :model="category">
         <el-form-item label="分类名称">
           <el-input v-model="category.name" autocomplete="off"></el-input>
@@ -71,6 +78,7 @@ export default {
         icon: "",
         productUnit: "",
       },
+      maxLevel: 0,
       dialogVisible: false,
       dialogType: "",
       title: "",
@@ -131,13 +139,33 @@ export default {
         this.editCategory();
       }
     },
+    allowDrop(draggingNode, dropNode, type) {
+      this.countNodeLevel(draggingNode.data);
+      let deep = this.maxLevel - draggingNode.data.catLevel + 1;
+      if ((type = "inner")) {
+        return deep + dropNode.level <= 3;
+      } else {
+        return deep + dropNode.parent.level <= 3;
+      }
+    },
+    countNodeLevel(node) {
+      //找出所有子节点，求最大深度
+      if (node.children != null && node.children.length > 0) {
+        for (let i = 0; i < node.children.length; i++) {
+          if (node.children[i].catId > this.maxLevel) {
+            this.maxLevel = node.children[i].catId;
+          }
+          this.countNodeLevel(node.children[i]);
+        }
+      }
+    },
     //修改3级分类
     editCategory() {
-      var {catId,name,icon,productUnit} = this.category;
+      var { catId, name, icon, productUnit } = this.category;
       this.http({
         url: this.$http.adornUrl("/product/category/update"),
         method: "post",
-        data: this.$http.adornData({catId,name,icon,productUnit}, false),
+        data: this.$http.adornData({ catId, name, icon, productUnit }, false),
       }).then(({ data }) => {
         this.$message({
           message: "菜单修改成功",
