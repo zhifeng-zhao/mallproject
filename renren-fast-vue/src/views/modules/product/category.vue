@@ -4,11 +4,12 @@
       :data="menus"
       :props="defaultProps"
       :expand-on-click-node="false"
-      show-checkbox="true"
+      show-checkbox
       node-key="catId"
       :default-expanded-keys="expandedKey"
       draggable
       :allow-drop="allowDrop"
+      @node-drop="handleDrop"
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -68,6 +69,7 @@ export default {
   data() {
     return {
       menus: [],
+      updateNodes:[],
       category: {
         name: "",
         parentCid: 0,
@@ -78,7 +80,7 @@ export default {
         icon: "",
         productUnit: "",
       },
-      maxLevel: 0,
+      maxLevel: 3,
       dialogVisible: false,
       dialogType: "",
       title: "",
@@ -139,21 +141,43 @@ export default {
         this.editCategory();
       }
     },
+    handleDrop(draggingNode, dropNode, dropType, ev) {
+        console.log('tree drop: ',draggingNode, dropNode, dropType);
+        //最新父节点id
+        let pCid = 0;   
+        let silbings = null;
+        if (dropType == "before" || dropType == "after") {
+          pCid = dropNode.data.parent.catId == undefined ? 0:dropNode.data.parent.catId;
+          silbings = dropNode.parent.childNodes;
+        }  else {
+          pCid = dropNode.data.catId;
+          silbings = dropNode.childNodes;
+        }
+        //最新顺序
+        for (let i = 0;i<silbings.length;i++){
+          if(silbings[i].data.catId == draggingNode.data.catId) {
+              this.updateNodes.push({catId:silbings[i].data.catId,sort:i,parentCid:pCid})
+          } else {
+              this.updateNodes.push({catId:silbings[i].data.catId,sort:i})
+          }
+        }
+        //最新层级
+      },
     allowDrop(draggingNode, dropNode, type) {
       this.countNodeLevel(draggingNode.data);
       let deep = this.maxLevel - draggingNode.data.catLevel + 1;
-      if ((type = "inner")) {
-        return deep + dropNode.level <= 3;
+      if (type = "inner") {
+        return (deep + dropNode.level) <= 3;
       } else {
-        return deep + dropNode.parent.level <= 3;
+        return (deep + dropNode.parent.level) <= 3;
       }
     },
     countNodeLevel(node) {
       //找出所有子节点，求最大深度
       if (node.children != null && node.children.length > 0) {
         for (let i = 0; i < node.children.length; i++) {
-          if (node.children[i].catId > this.maxLevel) {
-            this.maxLevel = node.children[i].catId;
+          if (node.children[i].catLevel > this.maxLevel) {
+            this.maxLevel = node.children[i].catLevel;
           }
           this.countNodeLevel(node.children[i]);
         }
