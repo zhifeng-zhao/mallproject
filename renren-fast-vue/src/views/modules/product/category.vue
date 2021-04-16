@@ -69,7 +69,7 @@ export default {
   data() {
     return {
       menus: [],
-      updateNodes:[],
+      updateNodes: [],
       category: {
         name: "",
         parentCid: 0,
@@ -142,34 +142,78 @@ export default {
       }
     },
     handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log('tree drop: ',draggingNode, dropNode, dropType);
-        //最新父节点id
-        let pCid = 0;   
-        let silbings = null;
-        if (dropType == "before" || dropType == "after") {
-          pCid = dropNode.data.parent.catId == undefined ? 0:dropNode.data.parent.catId;
-          silbings = dropNode.parent.childNodes;
-        }  else {
-          pCid = dropNode.data.catId;
-          silbings = dropNode.childNodes;
-        }
-        //最新顺序
-        for (let i = 0;i<silbings.length;i++){
-          if(silbings[i].data.catId == draggingNode.data.catId) {
-              this.updateNodes.push({catId:silbings[i].data.catId,sort:i,parentCid:pCid})
-          } else {
-              this.updateNodes.push({catId:silbings[i].data.catId,sort:i})
+      console.log("tree drop: ", draggingNode, dropNode, dropType);
+      //最新父节点id
+      let pCid = 0;
+      let silbings = null;
+      if (dropType == "before" || dropType == "after") {
+        pCid =
+          dropNode.data.parent.catId == undefined
+            ? 0
+            : dropNode.data.parent.catId;
+        silbings = dropNode.parent.childNodes;
+      } else {
+        pCid = dropNode.data.catId;
+        silbings = dropNode.childNodes;
+      }
+      //最新顺序
+      for (let i = 0; i < silbings.length; i++) {
+        if (silbings[i].data.catId == draggingNode.data.catId) {
+          //遍历当前拖拽节点
+          let catLevel = draggingNode.level;
+          if (silbings[i].level != draggingNode.level) {
+            //层级发送变化
+            catLevel = silbings[i].level;
+            this.updateChildNodesLevel(silbings[i]);
           }
+          this.updateNodes.push({
+            catId: silbings[i].data.catId,
+            sort: i,
+            parentCid: pCid,
+          });
+        } else {
+          this.updateNodes.push({
+            catId: silbings[i].data.catId,
+            sort: i,
+            catLevel: catLevel,
+          });
         }
-        //最新层级
-      },
+      }
+      //发送请求
+      this.http({
+        url: this.$http.adornUrl("/product/category/update/sort"),
+        method: "post",
+        data: this.$http.adornData(this.updateNodes, false),
+      }).then(({ data }) => {
+        this.$message({
+          message:"菜单顺序修改成功",
+          type:"success"
+        });
+        this.getMenus();
+        this.expandedKey = [pCid];
+        this.updateNodes = [];
+        this.maxLevel = 0;
+      });
+    },
+    updateChildNodesLevel(node) {
+      if (node.childNodes.length > 0) {
+        for (let i = 0; i < node.childNodes.length; i++) {
+          var cNode = node.childNodes[i].data;
+          this.updateNodes.push({
+            catId: cNode.catId,
+            catLevel: node.childNodes[i].level,
+          });
+          this.updateChildNodesLevel(node.childNodes[i]);
+        }
+      }
+    },
     allowDrop(draggingNode, dropNode, type) {
       this.countNodeLevel(draggingNode.data);
       let deep = this.maxLevel - draggingNode.data.catLevel + 1;
-      if (type = "inner") {
-        return (deep + dropNode.level) <= 3;
+      if ((type = "inner")) {
+        return deep + dropNode.level <= 3;
       } else {
-        return (deep + dropNode.parent.level) <= 3;
+        return deep + dropNode.parent.level <= 3;
       }
     },
     countNodeLevel(node) {
